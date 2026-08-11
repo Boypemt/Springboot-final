@@ -95,5 +95,5 @@
 | Customers | 1 : many | Orders | Identifying: No |
 | Orders | 1 : many | OrderItems | Identifying: Yes (Weak Entity) |
 | Products | 1 : many | OrderItems | Identifying: No |
-| Plants | 1 : many | Products | Identifying: No |
+| Plants | 1 : 1 | Products | Identifying: No |
 | Types | 1 : many | Plants | Identifying: No |
