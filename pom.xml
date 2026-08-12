@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.5.0</version>
+        <relativePath/>
+    </parent>
+
+    <groupId>th.mfu.pvz</groupId>
+    <artifactId>pvz-shop</artifactId>
+    <version>1.0-SNAPSHOT</version>
+
+    <!--
+        packaging = pom: this project builds no jar of its own. Its job is to tie
+        the six services together and hold the settings they share.
+
+        ALWAYS run Maven from THIS folder.
+    -->
+    <packaging>pom</packaging>
+    <name>pvz-shop</name>
+    <description>Plants vs Zombie Shop - microservice backend</description>
+
+    <modules>
+        <module>naming-server</module>
+        <module>catalog-service</module>
+        <module>customer-service</module>
+        <module>order-service</module>
+        <module>inventory-service</module>
+        <module>notification-service</module>
+    </modules>
+
+    <properties>
+        <java.version>11</java.version>
+        <!-- 2020.0.x is the Spring Cloud train that matches Spring Boot 2.5 -->
+        <spring-cloud.version>2020.0.3</spring-cloud.version>
+        <mapstruct.version>1.5.5.Final</mapstruct.version>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring-cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <!-- every service uses MapStruct, so declare it once here -->
+    <dependencies>
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct</artifactId>
+            <version>${mapstruct.version}</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <!--
+                    MapStruct generates the mapper implementations WHILE the code
+                    compiles, so it is an annotation processor and not an
+                    ordinary dependency. Generated code ends up in
+                    target/generated-sources/annotations/.
+                -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <configuration>
+                        <release>${java.version}</release>
+                        <annotationProcessorPaths>
+                            <path>
+                                <groupId>org.mapstruct</groupId>
+                                <artifactId>mapstruct-processor</artifactId>
+                                <version>${mapstruct.version}</version>
+                            </path>
+                        </annotationProcessorPaths>
+                        <compilerArgs>
+                            <compilerArg>-Amapstruct.defaultComponentModel=spring</compilerArg>
+                        </compilerArgs>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+
+</project>
