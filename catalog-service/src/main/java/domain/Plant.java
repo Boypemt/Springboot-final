@@ -1,4 +1,4 @@
-package classes;
+package domain;
 
 import javax.persistence.*;
 
@@ -9,31 +9,22 @@ public class Plant {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @Column(name = "name", nullable = false, length = 100)
     private String name;
 
     @ManyToOne
-    @JoinColumn(name = "class_id", nullable = false)
     private PlantClass plantClass;
 
     @ManyToOne
-    @JoinColumn(name = "environment_id", nullable = false)
     private Environment environment;
 
-    @Column(name = "description", columnDefinition = "TEXT")
     private String description;
 
-    @Column(name = "hp", nullable = false)
     private Integer hp;
 
-    @Column(name = "dmg", nullable = false)
     private Integer dmg;
 
-    @Column(name = "sun_cost", nullable = false)
     private Integer sunCost;
 
-    @Column(name = "action_speed", nullable = false, length = 50)
     private String actionSpeed;
 
     public Plant() {

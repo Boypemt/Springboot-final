@@ -1,4 +1,4 @@
-package classes;
+package domain;
 
 import java.math.BigDecimal;
 import javax.persistence.*;
@@ -12,13 +12,10 @@ public class Product {
     private Long id;
 
     @OneToOne
-    @JoinColumn(name = "plant_id", referencedColumnName = "id", nullable = false, unique = true)
     private Plant plant;
 
-    @Column(name = "price", nullable = false, precision = 10, scale = 2)
     private BigDecimal price;
 
-    @Column(name = "stock", nullable = false)
     private Integer stock;
 
     public Product() {

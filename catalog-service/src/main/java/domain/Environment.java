@@ -1,27 +1,25 @@
-package classes;
+package domain;
 
 import javax.persistence.*;
 
 @Entity
-@Table(name = "classes")
-public class PlantClass {
+@Table(name = "environments")
+public class Environment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "classname", nullable = false, unique = true, length = 50)
-    private String classname;
+    private String envname;
 
-    @Column(name = "description", columnDefinition = "TEXT")
     private String description;
 
-    public PlantClass() {
+    public Environment() {
     }
 
-    public PlantClass(Long id, String classname, String description) {
+    public Environment(Long id, String envname, String description) {
         this.id = id;
-        this.classname = classname;
+        this.envname = envname;
         this.description = description;
     }
 
@@ -33,12 +31,12 @@ public class PlantClass {
         this.id = id;
     }
 
-    public String getClassname() {
-        return classname;
+    public String getEnvname() {
+        return envname;
     }
 
-    public void setClassname(String classname) {
-        this.classname = classname;
+    public void setEnvname(String envname) {
+        this.envname = envname;
     }
 
     public String getDescription() {
