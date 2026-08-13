@@ -12,9 +12,11 @@ public class Plant {
     private String name;
 
     @ManyToOne
+    @JoinColumn(name = "class_id")
     private PlantClass plantClass;
 
     @ManyToOne
+    @JoinColumn(name = "environment_id")
     private Environment environment;
 
     private String description;
@@ -23,8 +25,10 @@ public class Plant {
 
     private Integer dmg;
 
+    @Column(name = "sun_cost")
     private Integer sunCost;
 
+    @Column(name = "action_speed")
     private String actionSpeed;
 
     public Plant() {

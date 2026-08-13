@@ -12,6 +12,7 @@ public class Product {
     private Long id;
 
     @OneToOne
+    @JoinColumn(name="plant_id", unique=true)
     private Plant plant;
 
     private BigDecimal price;
