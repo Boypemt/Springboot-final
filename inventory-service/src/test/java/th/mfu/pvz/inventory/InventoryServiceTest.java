@@ -3,18 +3,22 @@ package th.mfu.pvz.inventory;
 import th.mfu.pvz.inventory.dto.OrderItemEvent;
 import th.mfu.pvz.inventory.dto.OrderPlacedEvent;
 import th.mfu.pvz.inventory.dto.ProductDTO;
+import th.mfu.pvz.inventory.dto.StockUpdateRequest;
 import th.mfu.pvz.inventory.feign.CatalogClient;
 import th.mfu.pvz.inventory.repository.StockMovementRepository;
 import th.mfu.pvz.inventory.service.InventoryService;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 class InventoryServiceTest {
@@ -41,7 +45,11 @@ class InventoryServiceTest {
 
         service.processOrderPlaced(event);
 
-        verify(catalogClient, times(1)).updateStock(eq(2L), any());
+        ArgumentCaptor<StockUpdateRequest> captor = ArgumentCaptor.forClass(StockUpdateRequest.class);
+        verify(catalogClient, times(1)).updateStock(eq(2L), captor.capture());
+        // catalog-service does newStock = currentStock + delta, so a purchase
+        // of qty=3 must send delta=-3, never +3.
+        assertEquals(-3, captor.getValue().getDelta());
         verify(repository, times(1)).save(any());
     }
 

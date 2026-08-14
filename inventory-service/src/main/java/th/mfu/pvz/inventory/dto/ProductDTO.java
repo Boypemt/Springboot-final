@@ -20,7 +20,7 @@ public class ProductDTO {
     private Long plantId;
     private BigDecimal price;
     private Integer stock;
-    private String servedBy;
+    private Integer servedBy;
 
     public ProductDTO() {
         // Jackson
@@ -58,11 +58,11 @@ public class ProductDTO {
         this.stock = stock;
     }
 
-    public String getServedBy() {
+    public Integer getServedBy() {
         return servedBy;
     }
 
-    public void setServedBy(String servedBy) {
+    public void setServedBy(Integer servedBy) {
         this.servedBy = servedBy;
     }
 }

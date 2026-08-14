@@ -48,7 +48,7 @@ public class InventoryService {
 
     private void deductStockForItem(Long orderId, OrderItemEvent item) {
         try {
-            catalogClient.updateStock(item.getProductId(), new StockUpdateRequest(item.getQty()));
+            catalogClient.updateStock(item.getProductId(), new StockUpdateRequest(-item.getQty()));
             saveMovement(orderId, item, "OK", null);
             log.info("Deducted stock: orderId={} productId={} qty={}", orderId, item.getProductId(), item.getQty());
         } catch (Exception e) {
