@@ -17,3 +17,5 @@ Thumbs.db
 
 # logs
 *.log
+
+.claude/

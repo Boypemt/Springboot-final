@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Plants vs Zombie Shop — Demo Console</title>
+<style>
+  :root{
+    --green:#2C5F2D; --moss:#97BC62; --cream:#F5F5F5; --ink:#1b2a1b;
+    --grey:#6b7a6b; --red:#b3402f; --amber:#c08a1e; --line:#dfe5df;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:Calibri,Arial,sans-serif;background:var(--cream);color:var(--ink);font-size:15px}
+  header{background:var(--green);color:#fff;padding:14px 22px;display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+  header h1{font-size:20px;margin:0;font-weight:700}
+  header .sub{font-size:13px;opacity:.85}
+  #services{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
+  .pill{font-size:12px;padding:3px 9px;border-radius:11px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3)}
+  .pill.up{background:var(--moss);color:#14210f;border-color:var(--moss)}
+  .pill.down{background:var(--red);border-color:var(--red)}
+  main{padding:18px 22px;display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start}
+  .wide{grid-column:1 / -1}
+  section{background:#fff;border:1px solid var(--line);border-radius:8px;padding:14px 16px}
+  h2{font-size:15px;margin:0 0 4px;display:flex;align-items:center;gap:8px}
+  .tag{font-size:11px;font-weight:700;padding:2px 7px;border-radius:4px;background:var(--moss);color:#14210f}
+  .hint{font-size:12px;color:var(--grey);margin:0 0 10px}
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  th{text-align:left;font-size:12px;color:var(--grey);border-bottom:1px solid var(--line);padding:5px 6px;font-weight:600}
+  td{padding:6px;border-bottom:1px solid #f0f3f0;vertical-align:middle}
+  tr:last-child td{border-bottom:none}
+  button{font-family:inherit;font-size:13px;padding:5px 11px;border-radius:5px;border:1px solid var(--green);
+         background:var(--green);color:#fff;cursor:pointer}
+  button:hover{opacity:.88}
+  button.ghost{background:#fff;color:var(--green)}
+  button.danger{background:#fff;color:var(--red);border-color:var(--red)}
+  button.mini{padding:3px 8px;font-size:12px}
+  input,select{font-family:inherit;font-size:13px;padding:5px 7px;border:1px solid var(--line);border-radius:5px;background:#fff}
+  input[type=number]{width:74px}
+  .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px}
+  .served{font-size:11px;font-weight:700;padding:2px 7px;border-radius:4px;background:#e8eee2;color:var(--green)}
+  #log{font-family:Consolas,monospace;font-size:12px;max-height:210px;overflow:auto;background:#14210f;color:#d9e5cf;
+       border-radius:6px;padding:9px 11px;line-height:1.55}
+  #log div{white-space:pre-wrap}
+  .m{font-weight:700;display:inline-block;width:56px}
+  .s2{color:#9ede7a}.s4{color:#f5c451}.s5{color:#f28b82}
+  .empty{color:var(--grey);font-size:13px;padding:8px 2px}
+  .flash{animation:fl 1.3s ease-out}
+  @keyframes fl{from{background:#fff6cc}to{background:transparent}}
+  @media(max-width:900px){main{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>🌻 Plants vs Zombie Shop</h1>
+    <div class="sub">Microservice demo console · every button below is one REST call</div>
+  </div>
+  <div id="services"></div>
+</header>
+
+<main>
+
+  <!-- ============ CATALOG : all five REST verbs ============ -->
+  <section class="wide">
+    <h2>Catalog <span class="tag">GET · POST · PUT · PATCH · DELETE</span>
+        <span id="servedBadge" class="served">served by —</span></h2>
+    <p class="hint">catalog-service :8100 — the five verbs the rubric asks for.
+       Reload repeatedly with two instances running and “served by” alternates 8100 / 8101: that is the load balancer.</p>
+
+    <div class="row">
+      <button class="ghost" onclick="loadProducts()">GET /api/products</button>
+      <span style="width:14px"></span>
+      <input id="np" placeholder="new plant name" style="width:150px">
+      <input id="npPrice" type="number" step="0.01" placeholder="price" value="120">
+      <input id="npStock" type="number" placeholder="stock" value="10">
+      <button onclick="createProduct()">POST — create</button>
+    </div>
+
+    <table>
+      <thead><tr><th>id</th><th>plant</th><th>class</th><th>env</th><th>price</th><th>stock</th><th style="width:290px">actions</th></tr></thead>
+      <tbody id="products"><tr><td colspan="7" class="empty">click GET /api/products</td></tr></tbody>
+    </table>
+  </section>
+
+  <!-- ============ CUSTOMERS ============ -->
+  <section>
+    <h2>Customers <span class="tag">GET</span></h2>
+    <p class="hint">customer-service :8200 — Customer 1:N Address. No password is ever sent: that is the DTO doing its job.</p>
+    <div class="row"><button class="ghost" onclick="loadCustomers()">GET /api/customers</button></div>
+    <table>
+      <thead><tr><th>id</th><th>username</th><th>email</th><th>default address</th></tr></thead>
+      <tbody id="customers"><tr><td colspan="4" class="empty">—</td></tr></tbody>
+    </table>
+  </section>
+
+  <!-- ============ PLACE ORDER : Feign + Kafka ============ -->
+  <section>
+    <h2>Place an order <span class="tag">Feign → 2 services, then Kafka</span></h2>
+    <p class="hint">order-service :8300 — validates the customer and the product over Feign, copies the price,
+       saves, then publishes <code>OrderPlaced</code>. The browser waits for none of the consumers.</p>
+    <div class="row">
+      <select id="oc" style="min-width:130px"></select>
+      <select id="op" style="min-width:150px"></select>
+      <input id="oq" type="number" value="2" min="1">
+      <button onclick="placeOrder()">POST /api/orders</button>
+    </div>
+    <div id="orderResult" class="empty">—</div>
+  </section>
+
+  <!-- ============ ORDERS ============ -->
+  <section class="wide">
+    <h2>Orders <span class="tag">GET · PATCH · DELETE</span></h2>
+    <p class="hint">PATCH sends only <code>{"status":"shipped"}</code> — the lines, total and customer survive, because the
+       mapper skips null fields. DELETE removes the order and cascades to its lines (weak entity).</p>
+    <div class="row"><button class="ghost" onclick="loadOrders()">GET /api/orders</button></div>
+    <table>
+      <thead><tr><th>id</th><th>customer</th><th>items</th><th>total</th><th>status</th><th>servedBy</th><th style="width:250px">actions</th></tr></thead>
+      <tbody id="orders"><tr><td colspan="7" class="empty">—</td></tr></tbody>
+    </table>
+  </section>
+
+  <!-- ============ KAFKA CONSUMERS ============ -->
+  <section>
+    <h2>Inventory <span class="tag">Kafka · inventory-group</span></h2>
+    <p class="hint">inventory-service :8400 — nobody calls it. It subscribed, so it heard the event and cut the stock.</p>
+    <table>
+      <thead><tr><th>order</th><th>product</th><th>qty</th><th>status</th><th>when</th></tr></thead>
+      <tbody id="stock"><tr><td colspan="5" class="empty">—</td></tr></tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>Notifications <span class="tag">Kafka · notification-group</span></h2>
+    <p class="hint">notification-service :8500 — <b>different group id</b>, so it receives its own copy of the same event.
+       Same group would have split the stream between the two.</p>
+    <table>
+      <thead><tr><th>order</th><th>message</th><th>when</th></tr></thead>
+      <tbody id="notes"><tr><td colspan="3" class="empty">—</td></tr></tbody>
+    </table>
+  </section>
+
+  <!-- ============ REQUEST LOG ============ -->
+  <section class="wide">
+    <h2>Request log</h2>
+    <p class="hint">Every call this page makes, with the method and the status code it got back — useful to narrate during the demo.</p>
+    <div id="log"><div style="color:#7d8f70">waiting…</div></div>
+  </section>
+
+</main>
+
+<script>
+const CATALOG = 'http://localhost:8100';
+const CUSTOMER = 'http://localhost:8200';
+const ORDER    = '';                       // same origin - this page is served by order-service
+const INVENTORY= 'http://localhost:8400';
+const NOTIFY   = 'http://localhost:8500';
+
+const SERVICES = [
+  ['catalog',      CATALOG  + '/api/products'],
+  ['customer',     CUSTOMER + '/api/customers'],
+  ['order',        ORDER    + '/api/orders'],
+  ['inventory',    INVENTORY+ '/api/stock-movements'],
+  ['notification', NOTIFY   + '/api/notifications']
+];
+
+let products = [], customers = [];
+
+/* ---------- tiny fetch wrapper that logs every call ---------- */
+async function call(method, url, body){
+  const opt = {method, headers:{}};
+  if (body !== undefined){ opt.headers['Content-Type']='application/json'; opt.body = JSON.stringify(body); }
+  let res, txt=null;
+  try{
+    res = await fetch(url, opt);
+  }catch(e){
+    log(method, url, 'ERR', e.message);
+    throw e;
+  }
+  log(method, url, res.status);
+  if (res.status !== 204){
+    const t = await res.text();
+    if (t) { try { txt = JSON.parse(t); } catch(_) { txt = t; } }
+  }
+  return {status: res.status, body: txt};
+}
+
+function log(method, url, status, extra){
+  const box = document.getElementById('log');
+  if (box.dataset.clean !== '1'){ box.innerHTML=''; box.dataset.clean='1'; }
+  const cls = status>=500?'s5' : status>=400?'s4' : status==='ERR'?'s5' : 's2';
+  const time = new Date().toLocaleTimeString();
+  const line = document.createElement('div');
+  line.innerHTML = `<span style="color:#7d8f70">${time}</span> <span class="m">${method}</span> `
+                 + `${url.replace(/^http:\/\/localhost/,':')} <span class="${cls}">${status}</span>`
+                 + (extra? ` <span class="s5">${extra}</span>`:'');
+  box.appendChild(line);
+  box.scrollTop = box.scrollHeight;
+}
+
+const money = v => v==null ? '—' : Number(v).toFixed(2);
+const when  = t => t ? String(t).replace('T',' ').substring(0,19) : '—';
+
+/* ---------- service health strip ---------- */
+async function ping(){
+  const bar = document.getElementById('services');
+  bar.innerHTML = '';
+  for (const [name, url] of SERVICES){
+    const el = document.createElement('span');
+    el.className = 'pill'; el.textContent = name;
+    bar.appendChild(el);
+    fetch(url).then(r => el.className = 'pill ' + (r.ok?'up':'down'))
+              .catch(()  => el.className = 'pill down');
+  }
+}
+
+/* ---------- CATALOG : the five verbs ---------- */
+async function loadProducts(){
+  const r = await call('GET', CATALOG + '/api/products');
+  products = r.body || [];
+  const served = products.length ? products[0].servedBy : null;
+  const badge = document.getElementById('servedBadge');
+  badge.textContent = 'served by ' + (served ?? '—');
+  badge.classList.remove('flash'); void badge.offsetWidth; badge.classList.add('flash');
+
+  const tb = document.getElementById('products');
+  tb.innerHTML = products.length ? '' : '<tr><td colspan="7" class="empty">no products</td></tr>';
+  products.forEach(p => {
+    const tr = document.createElement('tr');
+    tr.innerHTML =
+      `<td>${p.id}</td><td><b>${p.plantName ?? '—'}</b></td><td>${p.className ?? '—'}</td>`
+    + `<td>${p.environmentName ?? '—'}</td><td>${money(p.price)}</td><td>${p.stock ?? '—'}</td>`
+    + `<td>
+         <input type="number" step="0.01" value="${p.price ?? 0}" id="pr${p.id}" style="width:80px">
+         <button class="mini ghost" onclick="patchPrice(${p.id})">PATCH price</button>
+         <button class="mini ghost" onclick="putProduct(${p.id})">PUT</button>
+         <button class="mini danger" onclick="deleteProduct(${p.id})">DELETE</button>
+       </td>`;
+    tb.appendChild(tr);
+  });
+  fillSelects();
+}
+
+async function createProduct(){
+  const name = document.getElementById('np').value.trim();
+  if (!name){ alert('type a plant name'); return; }
+  const body = {
+    plantName: name,
+    price: Number(document.getElementById('npPrice').value),
+    stock: Number(document.getElementById('npStock').value)
+  };
+  const r = await call('POST', CATALOG + '/api/products', body);
+  if (r.status >= 400) alert('POST answered ' + r.status + ' — the catalog may want a plantId; see the log');
+  loadProducts();
+}
+
+/* PATCH: send ONE field. Everything else must survive. */
+async function patchPrice(id){
+  const price = Number(document.getElementById('pr'+id).value);
+  await call('PATCH', CATALOG + '/api/products/' + id, {price});
+  loadProducts();
+}
+
+/* PUT: full replace - the fields you omit get cleared. Same body, opposite result. */
+async function putProduct(id){
+  const p = products.find(x => x.id === id);
+  const price = Number(document.getElementById('pr'+id).value);
+  if (!confirm('PUT replaces the whole product.\nPATCH merges, PUT replaces — that is why both verbs exist.\n\nContinue?')) return;
+  await call('PUT', CATALOG + '/api/products/' + id,
+             {plantId:p.plantId, plantName:p.plantName, price:price, stock:p.stock});
+  loadProducts();
+}
+
+async function deleteProduct(id){
+  if (!confirm('DELETE product ' + id + '?')) return;
+  await call('DELETE', CATALOG + '/api/products/' + id);
+  loadProducts();
+}
+
+/* ---------- CUSTOMERS ---------- */
+async function loadCustomers(){
+  const r = await call('GET', CUSTOMER + '/api/customers');
+  customers = r.body || [];
+  const tb = document.getElementById('customers');
+  tb.innerHTML = customers.length ? '' : '<tr><td colspan="4" class="empty">no customers</td></tr>';
+  customers.forEach(c => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${c.id}</td><td><b>${c.username}</b></td><td>${c.email ?? '—'}</td>`
+                 + `<td>${c.defaultAddress ?? '—'}</td>`;
+    tb.appendChild(tr);
+  });
+  fillSelects();
+}
+
+function fillSelects(){
+  const cs = document.getElementById('oc'), ps = document.getElementById('op');
+  cs.innerHTML = customers.map(c => `<option value="${c.id}">${c.id} · ${c.username}</option>`).join('')
+              || '<option value="">load customers first</option>';
+  ps.innerHTML = products.map(p => `<option value="${p.id}">${p.id} · ${p.plantName} (${money(p.price)})</option>`).join('')
+              || '<option value="">load products first</option>';
+}
+
+/* ---------- ORDERS : Feign + Kafka ---------- */
+async function placeOrder(){
+  const customerId = Number(document.getElementById('oc').value);
+  const productId  = Number(document.getElementById('op').value);
+  const qty        = Number(document.getElementById('oq').value);
+  if (!customerId || !productId){ alert('load customers and products first'); return; }
+
+  const r = await call('POST', ORDER + '/api/orders', {customerId, items:[{productId, qty}]});
+  const box = document.getElementById('orderResult');
+
+  if (r.status === 201){
+    const o = r.body;
+    box.className = 'flash';
+    box.innerHTML =
+      `<b>201 Created</b> — order #${o.id}<br>`
+    + `customer <b>${o.customerName}</b> <span class="hint">(came from customer-service over Feign)</span><br>`
+    + o.items.map(i => `${i.qty} × <b>${i.productName}</b> @ ${money(i.unitPrice)} = ${money(i.lineTotal)}`
+                     + ` <span class="hint">(name and price from catalog-service)</span>`).join('<br>')
+    + `<br>total <b>${money(o.totalPrice)}</b> · status ${o.status} · `
+    + `<span class="served">served by ${o.servedBy ?? '—'}</span>`;
+    setTimeout(refreshConsumers, 1200);   // give the consumers a moment
+    loadOrders(); loadProducts();
+  } else {
+    box.className = '';
+    box.innerHTML = `<b style="color:var(--red)">${r.status}</b> — `
+      + (r.status === 400 ? 'unknown customer/product, or not enough stock. The caller asked for something that is not there.'
+      :  r.status === 503 ? 'another service is down. You asked correctly; we cannot do it right now.'
+      : 'see the log');
+  }
+}
+
+async function loadOrders(){
+  const r = await call('GET', ORDER + '/api/orders');
+  const list = r.body || [];
+  const tb = document.getElementById('orders');
+  tb.innerHTML = list.length ? '' : '<tr><td colspan="7" class="empty">no orders yet</td></tr>';
+  list.forEach(o => {
+    const items = (o.items||[]).map(i => `${i.qty} × ${i.productName ?? ('#'+i.productId)}`).join(', ');
+    const tr = document.createElement('tr');
+    tr.innerHTML =
+      `<td>${o.id}</td><td>${o.customerName ?? ('#'+o.customerId)}</td><td>${items || '—'}</td>`
+    + `<td>${money(o.totalPrice)}</td><td><b>${o.status}</b></td><td>${o.servedBy ?? '—'}</td>`
+    + `<td>
+         <button class="mini ghost" onclick="patchStatus(${o.id},'paid')">PATCH paid</button>
+         <button class="mini ghost" onclick="patchStatus(${o.id},'shipped')">PATCH shipped</button>
+         <button class="mini danger" onclick="deleteOrder(${o.id})">DELETE</button>
+       </td>`;
+    tb.appendChild(tr);
+  });
+}
+
+async function patchStatus(id, status){
+  await call('PATCH', ORDER + '/api/orders/' + id, {status});
+  loadOrders();
+}
+
+async function deleteOrder(id){
+  if (!confirm('DELETE order ' + id + '? Its lines go with it (cascade).')) return;
+  await call('DELETE', ORDER + '/api/orders/' + id);
+  loadOrders();
+}
+
+/* ---------- the two Kafka consumers ---------- */
+async function refreshConsumers(){
+  try{
+    const s = await call('GET', INVENTORY + '/api/stock-movements');
+    const tb = document.getElementById('stock');
+    const rows = s.body || [];
+    tb.innerHTML = rows.length ? '' : '<tr><td colspan="5" class="empty">nothing consumed yet</td></tr>';
+    rows.slice().reverse().forEach(m => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>#${m.orderId}</td><td>#${m.productId}</td><td>${m.qtyDeducted}</td>`
+                   + `<td>${m.status ?? '—'}</td><td>${when(m.movementDate)}</td>`;
+      tb.appendChild(tr);
+    });
+  }catch(e){}
+
+  try{
+    const n = await call('GET', NOTIFY + '/api/notifications');
+    const tb = document.getElementById('notes');
+    const rows = n.body || [];
+    tb.innerHTML = rows.length ? '' : '<tr><td colspan="3" class="empty">nothing consumed yet</td></tr>';
+    rows.slice().reverse().forEach(x => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>#${x.orderId}</td><td>${x.message ?? '—'}</td><td>${when(x.createdAt)}</td>`;
+      tb.appendChild(tr);
+    });
+  }catch(e){}
+}
+
+/* ---------- boot ---------- */
+(async function init(){
+  ping();
+  await loadProducts().catch(()=>{});
+  await loadCustomers().catch(()=>{});
+  await loadOrders().catch(()=>{});
+  await refreshConsumers().catch(()=>{});
+  setInterval(refreshConsumers, 4000);   // watch the consumers catch up, live
+  setInterval(ping, 10000);
+})();
+</script>
+</body>
+</html>
