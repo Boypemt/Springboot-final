@@ -330,10 +330,10 @@ Then, for the marks:
 
 ## 9. AI usage
 
-| Tool | Used for |
-| --- | --- |
-| Claude (Anthropic) | Drafting this README from our database design, and scaffolding boilerplate (entity/DTO/mapper/controller skeletons). |
-| _add yours_ | _what you used it for_ |
+| Tool | Member | Used for |
+| --- | --- | --- |
+| Claude (Anthropic) | Team | Drafting this README from our database design, and scaffolding boilerplate (entity/DTO/mapper/controller skeletons). |
+| Antigravity (Google) | Pannawitch Sittitun (682110181) | Full end-to-end development of `catalog-service`: implementing JPA Entities, DTOs, MapStruct Mappers (for non-destructive PATCH), Repositories with derived queries, REST Controllers (covering all 5 HTTP Verbs, stock adjustment API, and `servedBy` load-balancer port enrichment), `data.sql` seed data (8 plants/products), and MockMvc unit tests (16 test cases). |
 
 The database design in Part 2 is our own work from the Database course. The
 service split, the Kafka event flow and the endpoint list were decided by the
