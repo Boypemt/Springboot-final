@@ -48,12 +48,10 @@ public class NotificationService {
     }
 
     private String buildMessage(OrderPlacedEvent event) {
-        int itemCount = event.getItems() == null ? 0 : event.getItems().size();
         return String.format(
-                "Your order #%d (%d item%s, total %.2f) has been placed.",
+                "Order #%d received from %s, total %.2f THB",
                 event.getOrderId(),
-                itemCount,
-                itemCount == 1 ? "" : "s",
+                event.getCustomerName(),
                 event.getTotalPrice()
         );
     }

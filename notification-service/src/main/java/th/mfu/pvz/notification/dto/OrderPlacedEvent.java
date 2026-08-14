@@ -7,6 +7,7 @@ import java.util.List;
 public class OrderPlacedEvent {
     private Long orderId;
     private Long customerId;
+    private String customerName;
     private BigDecimal totalPrice;
     private LocalDateTime orderDate;
     private List<OrderItemEvent> items;
@@ -29,6 +30,14 @@ public class OrderPlacedEvent {
 
     public void setCustomerId(Long customerId) {
         this.customerId = customerId;
+    }
+
+    public String getCustomerName() {
+        return customerName;
+    }
+
+    public void setCustomerName(String customerName) {
+        this.customerName = customerName;
     }
 
     public BigDecimal getTotalPrice() {
