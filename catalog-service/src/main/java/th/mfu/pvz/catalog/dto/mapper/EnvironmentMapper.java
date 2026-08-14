@@ -9,7 +9,7 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
 import th.mfu.pvz.catalog.domain.Environment;
 import th.mfu.pvz.catalog.dto.EnvironmentDTO;
 
-@Mapper(componentModel = "spring")
+@Mapper
 public interface EnvironmentMapper {
 
     EnvironmentDTO toDTO(Environment environment);

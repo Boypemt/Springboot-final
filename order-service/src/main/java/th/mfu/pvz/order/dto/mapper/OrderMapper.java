@@ -16,14 +16,16 @@ import th.mfu.pvz.order.dto.OrderDTO;
  * build you can read it in
  *   order-service/target/generated-sources/annotations/.../OrderMapperImpl.java
  * and it is nothing but plain getters and setters - no reflection, no runtime
- * magic. componentModel = "spring" makes it a @Component so it can be
- * @Autowired.
+ * magic. It is wired into Spring explicitly in config.MapperConfig via
+ * Mappers.getMapper(), not via @Component + classpath scanning - scanning the
+ * generated impls raced with Spring Data's repository scanner in this
+ * project and intermittently dropped a mapper bean.
  *
  * uses = OrderItemMapper.class tells MapStruct how to turn List<OrderItem> into
  * List<OrderItemDTO>: it calls the other mapper per element instead of me
  * writing a loop.
  */
-@Mapper(componentModel = "spring", uses = { OrderItemMapper.class })
+@Mapper(uses = { OrderItemMapper.class })
 public interface OrderMapper {
 
     /** Entity -> DTO. customerName and servedBy come from other services. */

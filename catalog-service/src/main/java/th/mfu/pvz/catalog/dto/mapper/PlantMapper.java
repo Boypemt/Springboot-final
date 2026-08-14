@@ -9,7 +9,7 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
 import th.mfu.pvz.catalog.domain.Plant;
 import th.mfu.pvz.catalog.dto.PlantDTO;
 
-@Mapper(componentModel = "spring")
+@Mapper
 public interface PlantMapper {
 
     @Mapping(source = "plantClass.id", target = "classId")

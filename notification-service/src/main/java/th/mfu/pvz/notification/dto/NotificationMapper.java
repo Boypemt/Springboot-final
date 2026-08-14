@@ -1,10 +1,7 @@
 package th.mfu.pvz.notification.dto;
 
-import org.springframework.stereotype.Component;
-
 import th.mfu.pvz.notification.domain.Notification;
 
-@Component
 public class NotificationMapper {
 
     public NotificationDTO toDTO(Notification entity) {

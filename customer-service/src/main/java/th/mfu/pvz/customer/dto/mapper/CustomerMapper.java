@@ -8,7 +8,7 @@ import th.mfu.pvz.customer.domain.Customer;
 import th.mfu.pvz.customer.dto.CustomerDTO;
 import th.mfu.pvz.customer.dto.CustomerRequestDTO;
 
-@Mapper(componentModel = "spring")
+@Mapper
 public interface CustomerMapper {
     CustomerDTO toDto(Customer customer);
     Customer toEntity(CustomerRequestDTO request);

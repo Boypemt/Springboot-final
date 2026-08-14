@@ -8,7 +8,7 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
 import th.mfu.pvz.catalog.domain.PlantClass;
 import th.mfu.pvz.catalog.dto.PlantClassDTO;
 
-@Mapper(componentModel = "spring")
+@Mapper
 public interface PlantClassMapper {
 
     PlantClassDTO toDTO(PlantClass plantClass);

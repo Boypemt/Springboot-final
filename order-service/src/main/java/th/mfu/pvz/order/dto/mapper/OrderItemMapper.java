@@ -11,7 +11,7 @@ import th.mfu.pvz.order.dto.OrderItemDTO;
  * and the other is arithmetic. Neither is a copy, so neither belongs to the
  * mapper - the controller fills them in.
  */
-@Mapper(componentModel = "spring")
+@Mapper
 public interface OrderItemMapper {
 
     @Mapping(target = "productName", ignore = true)

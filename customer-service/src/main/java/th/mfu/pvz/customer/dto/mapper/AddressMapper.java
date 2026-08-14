@@ -7,7 +7,7 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
 import th.mfu.pvz.customer.domain.Address;
 import th.mfu.pvz.customer.dto.AddressDTO;
 
-@Mapper(componentModel = "spring")
+@Mapper
 public interface AddressMapper {
     AddressDTO toDto(Address address);
     Address toEntity(AddressDTO dto);

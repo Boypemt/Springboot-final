@@ -4,6 +4,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.openfeign.EnableFeignClients;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 /**
  * inventory-service - owned by Member 4 - สายกลาง จะวะนะ (682110198)
@@ -14,6 +15,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 @SpringBootApplication
 @EnableDiscoveryClient
 @EnableFeignClients
+@EnableJpaRepositories(basePackages = "th.mfu.pvz.inventory.repository")
 public class InventoryServiceApplication {
 
     public static void main(String[] args) {
