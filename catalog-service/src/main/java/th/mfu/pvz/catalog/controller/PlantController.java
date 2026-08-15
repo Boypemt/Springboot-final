@@ -36,7 +36,7 @@ public class PlantController {
 
     @Autowired
     private Environment env;
-
+    //เติมหมายเลขพอร์ตปัจจุบันของ Server (เช่น 8100 หรือ 8101) ใส่ลงในฟิลด์ servedBy ของ DTO
     private PlantDTO enrichDTO(PlantDTO dto) {
         if (dto != null && env != null) {
             String portStr = env.getProperty("server.port");
